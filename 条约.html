@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主仆申请</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 50px 25px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+        }
+        .title1 {
+            font-size: 19px;
+            color: #777;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .title2 {
+            font-size: 24px;
+            color: #222;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+        .emoji {
+            font-size: 70px;
+            margin-bottom: 50px;
+            transition: transform 0.3s ease;
+        }
+        .emoji:hover {
+            transform: scale(1.1);
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 25px;
+            position: relative;
+            height: 60px; /* 固定高度，避免按钮偏移导致布局错乱 */
+        }
+        .btn {
+            padding: 18px 0;
+            border-radius: 15px;
+            border: none;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            z-index: 1;
+        }
+        .accept-btn {
+            background-color: #28a745;
+            color: #fff;
+            flex: 1;
+        }
+        .refuse-btn {
+            background-color: #dc3545;
+            color: #fff;
+            flex: 1;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        .accept-btn:active {
+            transform: scale(0.96);
+            background-color: #218838;
+        }
+        /* 恭喜页面样式 */
+        .success-page {
+            background-color: #fff;
+            padding: 60px 30px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+        }
+        .success-emoji {
+            font-size: 90px;
+            margin-bottom: 30px;
+        }
+        .success-text {
+            font-size: 28px;
+            color: #222;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 申请页面 -->
+    <div class="container" id="applyPage">
+        <div class="title1">你的朋友向你发送了一封主仆申请</div>
+        <div class="title2">你的好友想要当你的主人，是否接受</div>
+        <div class="emoji">🙇‍♀️</div>
+        <div class="btn-group">
+            <button class="btn accept-btn" id="acceptBtn">接受</button>
+            <button class="btn refuse-btn" id="refuseBtn">拒绝</button>
+        </div>
+    </div>
+
+    <!-- 恭喜页面（默认隐藏） -->
+    <div class="success-page" id="successPage" style="display: none;">
+        <div class="success-emoji">🎉</div>
+        <div class="success-text">恭喜你，有了主人</div>
+    </div>
+
+    <script>
+        // 元素获取
+        const applyPage = document.getElementById('applyPage');
+        const successPage = document.getElementById('successPage');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const refuseBtn = document.getElementById('refuseBtn');
+        const btnGroup = document.querySelector('.btn-group');
+
+        // 拒绝按钮初始状态
+        let btnSize = 100; // 初始宽度百分比
+        let btnHeight = 60; // 初始高度px
+
+        // 接受按钮：跳转至恭喜页面
+        acceptBtn.addEventListener('click', () => {
+            applyPage.style.display = 'none';
+            successPage.style.display = 'flex';
+            successPage.style.flexDirection = 'column';
+            successPage.style.alignItems = 'center';
+            successPage.style.justifyContent = 'center';
+            successPage.style.minHeight = '100vh';
+            document.body.style.padding = 0;
+        });
+
+        // 拒绝按钮：点击换位置+缩小
+        refuseBtn.addEventListener('click', () => {
+            // 1. 缩小按钮（每次宽高各减10%，最小不低于30%/30px，避免无法点击）
+            btnSize = Math.max(30, btnSize - 10);
+            btnHeight = Math.max(30, btnHeight - 6);
+            refuseBtn.style.width = `${btnSize}%`;
+            refuseBtn.style.height = `${btnHeight}px`;
+            refuseBtn.style.fontSize = `${16 + (btnSize - 30) * 0.04}px`; // 字体同步缩小
+
+            // 2. 随机换位置（在按钮组范围内随机偏移）
+            const maxX = btnGroup.offsetWidth - refuseBtn.offsetWidth;
+            const maxY = btnGroup.offsetHeight - refuseBtn.offsetHeight;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            refuseBtn.style.left = `${randomX}px`;
+            refuseBtn.style.top = `${randomY}px`;
+
+            // 3. 震动反馈，增加趣味
+            refuseBtn.style.animation = 'shake 0.3s ease';
+            setTimeout(() => {
+                refuseBtn.style.animation = '';
+            }, 300);
+        });
+
+        // 添加震动动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0% { transform: translate(0, 0); }
+                20% { transform: translate(-4px, 4px); }
+                40% { transform: translate(4px, -4px); }
+                60% { transform: translate(-4px, -4px); }
+                80% { transform: translate(4px, 4px); }
+                100% { transform: translate(0, 0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
